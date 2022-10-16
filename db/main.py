@@ -12,7 +12,7 @@ TOPICS = [
 ]
 
 
-def main(uid, topic, score):
+def add_to_db(uid, topic, score, threshold):
 
     # Is uid in Users
     if is_new_user(uid):
@@ -20,6 +20,13 @@ def main(uid, topic, score):
 
     # Call update_score(uid, topic, score)
     update_score(uid, topic, score)
+
+    # STDOUT
+    print("Negativity Score: ", str(score))
+    print("{}'s most negative topic is '{}'".format(uid, get_saddest_topic(uid)))
+    print("CURRENT STANDING: ", str(get_sum_scores(uid)), "/", str(threshold))
+    # Return whether the threshold is crossed
+    return get_sum_scores(uid) >= threshold
 
 
 
@@ -285,7 +292,6 @@ def exec_statement(conn, stmt):
             cur.execute(stmt)
             res = cur.fetchall()
             conn.commit()
-            print(res)
             return res
     except ProgrammingError:
         return
