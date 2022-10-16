@@ -26,10 +26,4 @@ DATAFRAMES = [
 #     filename = "cumulative_data.csv"
 #     result.to_csv(filename, index=False)
 
-def shuffle():
-    df = pd.read_csv("cumulative_data.csv", sep=",")
-    df = df.sample(frac = 1)
-    df.to_csv("result.csv", index=False)
 
-
-shuffle()

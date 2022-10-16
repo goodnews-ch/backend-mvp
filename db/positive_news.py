@@ -114,7 +114,12 @@ def find_goodnews(user, topic):
     # Connect to CockroachDB
     connection = psycopg.connect(os.environ["DATABASE_URL"])
 
-    query = ""
+    query = "SELECT url FROM Goodnews AS g INNER JOIN UserURLs AS u ON g.url = u.url WHERE g.topic = '{}' AND u.user = '{}' LIMIT 1".format(topic, user)
+    url = exec_statement(connection, query)[0][0]
+
+    query = "DELETE FROM UserURLs WHERE user = '{}' AND url = '{}';".format(user, url)
     
     # Close communication with the database
     connection.close()
+
+    return url

@@ -7,6 +7,7 @@ def categorize_text(text_input):
         model='99b88c18-5e7c-49f6-ab8c-cc57cdebb7a3-ft',
         inputs=[text_input]
     )
-    return response
+    print("The text's classification was '{}'".format(response.classifications[0].prediction))
+    return response.classifications[0].prediction
 
-print(categorize_text("war"))
+
