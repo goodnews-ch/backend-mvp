@@ -1,10 +1,12 @@
-document.getElementById('start').addEventListener('click', async () => {
+document.getElementById('parent').addEventListener('click', async () => {
+  clicked = true
   const tab = await getCurrentTab()
   if(!tab) return alert('Require an active tab')
-  chrome.scripting.executeScript({
+  await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       files: ['main.js']
   })
+  document.getElementById('parent').removeChild(document.getElementById('start'))
 })
 
 async function getCurrentTab() {
@@ -23,14 +25,8 @@ chrome.runtime.onMessage.addListener(({ message }) => {
   }
 })
 
-chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
-  console.log('hi')
-  if (changeInfo.status == 'complete') {
-    chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
-      let url = tabs[0].url;
-      // use `url` here inside the callback because it's asynchronous!
-      document.getElementById('transcript').innerHTML = url
-      
-  })  
-  }
-})
+function showLatestTranscript() {
+  chrome.storage.local.get('transcript', ({ transcript }) => {
+      document.getElementById('transcript').innerHTML = transcript
+  })
+}

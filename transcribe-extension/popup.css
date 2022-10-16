@@ -1,8 +1,29 @@
 body {
-    width: 20rem;
+    background-image: url("./bg.svg");
+    background-color:black;
+    background-size: cover;
+    min-height: 433px;
+    max-height: 433px;
+    min-width: 279px;
+    max-width: 279px;
 }
 
-ul {
+.button {
+    background-color: #FAE16A;
+    border-color: #FAE16A;
+    position: absolute;
+    bottom: 0px;
+    border-style: solid;
+    width: 20px;
+    height: 20px;
+}
+
+.center {
+    text-align: center;
+    padding: 100px;
+}
+
+/* ul {
     list-style-type: none;
     padding-inline-start: 0;
     margin: 1rem 0;
@@ -21,4 +42,4 @@ li:nth-child(even) {
 h3,
 p {
     margin: 0;
-}
+} */
