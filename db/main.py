@@ -3,6 +3,7 @@ import os
 import psycopg
 from psycopg.errors import ProgrammingError
 from datetime import date
+
 TOPICS = [
     "War",
     "COVID",
@@ -10,16 +11,21 @@ TOPICS = [
     "Sports"
 ]
 
-def exec_statement(conn, stmt):
-    try:
-        with conn.cursor() as cur:
-            cur.execute(stmt)
-            res = cur.fetchall()
-            conn.commit()
-            print(res)
-            return res
-    except ProgrammingError:
-        return
+
+def main(uid, topic, score):
+
+    # Is uid in Users
+    if is_new_user(uid):
+        spin_up_user(uid)
+
+    # Call update_score(uid, topic, score)
+    update_score(uid, topic, score)
+
+
+
+"""
+SPIN UP RESOURCES
+"""
 
 def spin_up_resources():
     init_date()
@@ -32,6 +38,10 @@ def spin_up_user(uid):
     add_user_to_topics(uid)
     add_user_to_date(uid)
 
+
+"""
+NEW USER ADDITIONS
+"""
 
 def add_user_to_users(uid):
     # Connect to CockroachDB
@@ -61,6 +71,7 @@ def add_user_to_topics(uid):
     # Close communication with the database
     connection.close()
 
+
 def add_user_to_date(uid):
     # Connect to CockroachDB
     connection = psycopg.connect(os.environ["DATABASE_URL"])
@@ -77,30 +88,10 @@ def add_user_to_date(uid):
 
 
 
-def main(uid, topic, score):
-
-    # Is uid in Users
-    if is_new_user(uid):
-        spin_up_user(uid)
-
-
-
-    # Call update_score(uid, topic, score)
-    update_score(uid, topic, score)
-
-
-
-
-
-
-
 """
-
 INITS
 
-
 """
-
 
 # SCHEMA: (uid: user id)
 def init_users():
@@ -143,6 +134,7 @@ def init_topics():
     # Close communication with the database
     connection.close()
 
+
 def init_date():
     # Connect to CockroachDB
     connection = psycopg.connect(os.environ["DATABASE_URL"])
@@ -162,7 +154,6 @@ def init_date():
     exec_statement(connection, "SELECT * FROM Date")
     # Close communication with the database
     connection.close()
-
 
 
 def check_reinitialize(uid):
@@ -200,21 +191,12 @@ def reset_user_date(uid):
     # Close communication with the database
     connection.close()
 
+
+
+
 """
-
-
-
 UPDATES
-
-
-
 """
-
-
-
-
-
-
 
 def update_score(uid, topic, score):
 
@@ -234,28 +216,9 @@ def update_score(uid, topic, score):
 
 
     
-
-
-
-
-
-
-
 """
-
-
-
 GETS
-
-
-
-
-
 """
-
-
-
-
 
 def get_score(uid, topic):
     # Connect to CockroachDB
@@ -285,11 +248,9 @@ def get_saddest_topic(uid):
     query = "SELECT topic FROM topics WHERE uid = '{}' ORDER BY score DESC LIMIT 1".format(uid)
     
     topic = exec_statement(connection, query)[0][0]
-    
+
     connection.close()
     return topic
-
-
 
 
 def get_date(uid):
@@ -301,6 +262,7 @@ def get_date(uid):
     connection.close()
     return date
 
+
 def is_new_user(uid):
     connection = psycopg.connect(os.environ["DATABASE_URL"])
 
@@ -311,7 +273,19 @@ def is_new_user(uid):
 
     return 1 - user_bool
 
-# spin_up_resources()
-main("usr_two", "COVID", 5)
-get_saddest_topic("usr_two")
-get_sum_scores("usr_two")
+
+
+"""
+EXECUTION OF QUERY
+"""
+
+def exec_statement(conn, stmt):
+    try:
+        with conn.cursor() as cur:
+            cur.execute(stmt)
+            res = cur.fetchall()
+            conn.commit()
+            print(res)
+            return res
+    except ProgrammingError:
+        return
