@@ -8,6 +8,4 @@ def response(uid, text):
     negativity_score = calculate_score(text)
     topic = categorize_text(text)
     crossed_threshold = add_to_db(uid, topic, negativity_score, THRESHOLD)
-    return (crossed_threshold, "")
-
-response("user_two", "piece of shit")
+    return crossed_threshold

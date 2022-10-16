@@ -26,7 +26,11 @@ def add_to_db(uid, topic, score, threshold):
     print("{}'s most negative topic is '{}'".format(uid, get_saddest_topic(uid)))
     print("CURRENT STANDING: ", str(get_sum_scores(uid)), "/", str(threshold))
     # Return whether the threshold is crossed
-    return get_sum_scores(uid) >= threshold
+    if get_sum_scores(uid) >= threshold:
+        news = find_goodnews(uid, topic)
+        print("The suggested article is '{}'".format(news))
+        return (True, news)
+    return (False, "")
 
 
 
@@ -295,3 +299,117 @@ def exec_statement(conn, stmt):
             return res
     except ProgrammingError:
         return
+
+
+
+
+
+
+
+
+
+
+def init_goodnews():
+    # Connect to CockroachDB
+    connection = psycopg.connect(os.environ["DATABASE_URL"])
+
+    init_statements = [
+        # Clear out any existing data
+        "DROP TABLE IF EXISTS Goodnews",
+        # CREATE the users table
+        "CREATE TABLE IF NOT EXISTS Goodnews (url STRING PRIMARY KEY, topic STRING)"
+    ]
+
+    for statement in init_statements:
+        exec_statement(connection, statement)
+    
+
+    exec_statement(connection, "SELECT * FROM Goodnews")
+    # Close communication with the database
+    connection.close()
+
+
+def init_userurls():
+    # Connect to CockroachDB
+    connection = psycopg.connect(os.environ["DATABASE_URL"])
+
+    init_statements = [
+        # Clear out any existing data
+        "DROP TABLE IF EXISTS userurls",
+        # CREATE the users table
+        "CREATE TABLE IF NOT EXISTS userurls (uid STRING, url STRING)"
+    ]
+
+    for statement in init_statements:
+        exec_statement(connection, statement)
+    
+
+    exec_statement(connection, "SELECT * FROM userurls")
+    # Close communication with the database
+    connection.close()
+
+
+
+
+
+def insert_news(url, topic):
+    # Connect to CockroachDB
+    connection = psycopg.connect(os.environ["DATABASE_URL"])
+
+    query = "INSERT INTO Goodnews (url, topic) VALUES ('{}', '{}')".format(url, topic)
+
+    exec_statement(connection, query)
+
+    insert_userURLs(url)
+
+    exec_statement(connection, "SELECT * FROM Goodnews")
+    # Close communication with the database
+    connection.close()
+
+
+
+def insert_userURLs(url):
+    # Connect to CockroachDB
+    connection = psycopg.connect(os.environ["DATABASE_URL"])
+
+    all_users_query = "SELECT * FROM Users"
+    
+    users = exec_statement(connection, all_users_query)
+
+
+    user_lst = [user[0] for user in users]
+
+
+    for user in user_lst:
+        print(exec_statement(connection, "SELECT * FROM userurls"))
+        query = "INSERT INTO userurls (uid, url) VALUES ('{}', '{}')".format(user, url)
+        exec_statement(connection, query)
+
+
+    exec_statement(connection, "SELECT * FROM userurls")
+    # Close communication with the database
+    connection.close()
+
+def find_goodnews(user, topic):
+    # Connect to CockroachDB
+    connection = psycopg.connect(os.environ["DATABASE_URL"])
+
+    query = "SELECT * FROM Goodnews AS g NATURAL JOIN userurls AS u WHERE g.topic = '{}' AND u.uid = '{}' LIMIT 1".format(topic, user)
+    url = exec_statement(connection, query)[0][0]
+
+    # query = "DELETE FROM userurls WHERE uid = '{}' AND url = '{}';".format(user, url)
+    
+    # Close communication with the database
+    connection.close()
+
+    return url
+
+
+def load_news():
+    insert_news("https://justgivemepositivenews.com/home/vaccines-effective-against-new-omicron-subvariants-who-chief-says/", "COVID")
+    insert_news("https://www.bbc.com/news/health-63247997", "COVID")
+    insert_news("https://www.unhcr.org/en-us/news/stories/2022/5/6284d6bc4/ukrainian-refugees-find-warm-welcome-neighbouring-moldova.html", "War")
+    insert_news("https://www.goodgoodgood.co/articles/ukraine-good-news", "War")
+    insert_news("https://www.usatoday.com/story/sports/ncaaf/bigten/2022/10/16/michigan-football-penn-state-blake-corum-donovan-edwards/10517247002/", "Entertainment")
+    insert_news("https://goodcelebrity.com/2019/01/28/michael-jordan-make-a-wish-30-years/", "Entertainment")
+
