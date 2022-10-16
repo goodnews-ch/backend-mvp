@@ -48,6 +48,7 @@ def spin_up_user(uid):
     add_user_to_users(uid)
     add_user_to_topics(uid)
     add_user_to_date(uid)
+    add_user_to_news(uid)
 
 
 """
@@ -93,6 +94,27 @@ def add_user_to_date(uid):
     exec_statement(connection, query)
 
     exec_statement(connection, "SELECT * FROM Date")
+    # Close communication with the database
+    connection.close()
+
+def add_user_to_news(uid):
+    # Connect to CockroachDB
+    connection = psycopg.connect(os.environ["DATABASE_URL"])
+
+    all_news_query = "SELECT url FROM Goodnews"
+    all_urls = exec_statement(connection, all_news_query)
+
+    urls = [item[0] for item in all_urls]
+    print(urls)
+    print(len(urls))
+
+
+    for url in urls:
+        query = "INSERT INTO userurls (uid, url) VALUES ('{}', '{}')".format(uid, url)
+        exec_statement(connection, query)
+
+
+    print(exec_statement(connection, "SELECT * FROM userurls"))
     # Close communication with the database
     connection.close()
 
@@ -394,6 +416,10 @@ def find_goodnews(user, topic):
     # Connect to CockroachDB
     connection = psycopg.connect(os.environ["DATABASE_URL"])
 
+    query = "SELECT * FROM Goodnews"
+    url = exec_statement(connection, query)
+    print(url)
+
     query = "SELECT * FROM Goodnews AS g NATURAL JOIN userurls AS u WHERE g.topic = '{}' AND u.uid = '{}' LIMIT 1".format(topic, user)
     url = exec_statement(connection, query)[0][0]
 
@@ -413,3 +439,10 @@ def load_news():
     insert_news("https://www.usatoday.com/story/sports/ncaaf/bigten/2022/10/16/michigan-football-penn-state-blake-corum-donovan-edwards/10517247002/", "Entertainment")
     insert_news("https://goodcelebrity.com/2019/01/28/michael-jordan-make-a-wish-30-years/", "Entertainment")
 
+def reset():
+    spin_up_resources()
+    init_goodnews()
+    init_userurls()
+    load_news()
+
+reset()
