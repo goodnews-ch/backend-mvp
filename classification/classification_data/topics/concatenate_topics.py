@@ -18,9 +18,11 @@ def process():
     
     result = pd.concat(dfs)
     result = result.drop("TITLE", 1)
+    result = result.sample(frac = 1)
+    result = result[~result['title'].isnull()]
     
     # Write processed data to new csv file
     filename = "cumulative_data.csv"
-    df.to_csv(filename, index=False)
+    result.to_csv(filename, index=False)
 
 process()
