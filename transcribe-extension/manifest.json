@@ -4,6 +4,17 @@
     "manifest_version": 3,
     "host_permissions": ["*://*/"],
     "permissions": ["storage", "tabs", "scripting"],
+    "web_accessible_resources": [{
+        "resources": ["popup.html"],
+        "matches": ["*://*/*"]
+    }],
+    "content_scripts": [
+        {
+          "run_at": "document_end",
+          "matches": ["*://*/*"],
+          "js": ["jquery.js", "contentscript.js"]
+        }
+      ], 
     "action": {
         "default_popup": "popup.html"
     }

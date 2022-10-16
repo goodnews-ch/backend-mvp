@@ -9,6 +9,15 @@ document.getElementById('parent').addEventListener('click', async () => {
   document.getElementById('parent').removeChild(document.getElementById('start'))
 })
 
+async function check_youtube_presence() {
+  const tab = await getCurrentTab()
+  if ("youtube" in tab.url) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 async function getCurrentTab() {
   const queryOptions = { active: true, lastFocusedWindow: true }
   const [tab] = await chrome.tabs.query(queryOptions)
