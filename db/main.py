@@ -436,8 +436,10 @@ def load_news():
     insert_news("https://www.bbc.com/news/health-63247997", "COVID")
     insert_news("https://www.unhcr.org/en-us/news/stories/2022/5/6284d6bc4/ukrainian-refugees-find-warm-welcome-neighbouring-moldova.html", "War")
     insert_news("https://www.goodgoodgood.co/articles/ukraine-good-news", "War")
-    insert_news("https://www.usatoday.com/story/sports/ncaaf/bigten/2022/10/16/michigan-football-penn-state-blake-corum-donovan-edwards/10517247002/", "Entertainment")
-    insert_news("https://goodcelebrity.com/2019/01/28/michael-jordan-make-a-wish-30-years/", "Entertainment")
+    insert_news("https://www.usatoday.com/story/sports/ncaaf/bigten/2022/10/16/michigan-football-penn-state-blake-corum-donovan-edwards/10517247002/", "Sports")
+    insert_news("https://goodcelebrity.com/2019/01/28/michael-jordan-make-a-wish-30-years/", "Sports")
+    insert_news("https://www.etonline.com/cardi-b-donates-100k-to-her-school-in-the-bronx-surprises-students-in-sweet-moment-190840", "Entertainment")
+    insert_news("https://www.etonline.com/jason-momoa-cuts-his-hair-shows-off-dramatic-new-buzz-cut-for-a-good-cause-190262", "Entertainment")
 
 def reset():
     spin_up_resources()
@@ -445,4 +447,3 @@ def reset():
     init_userurls()
     load_news()
 
-reset()
